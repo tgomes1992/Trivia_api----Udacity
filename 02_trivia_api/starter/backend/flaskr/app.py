@@ -83,15 +83,17 @@ def get_questions():
     ndict = {}
     ndict["answer"] = i.answer
     categoria =  Category.query.get(i.category)
-    ndict["category"] = i.category-1
+    ndict["category"] = i.category
     ndict["difficulty"] = i.difficulty
     ndict["id"] = i.id
     ndict["question"] =i.question
     lista.append(ndict)
+
+
   
 
   return jsonify({
-    'questions': format_Question[start:end],
+    'questions': format_Question,
     'totalQuestion': len(format_Question),
     'categories': cat,
     })
@@ -119,7 +121,9 @@ def delete_questions(id):
 @app.route("/add/questions",methods=['POST'])
 def add_questions():
   resposta = request.get_json()
+  print(resposta)
   cat = int(resposta['category'])
+  print(cat)
   question = Question(question=resposta['question'],
                       answer=resposta['answer'],
                       category= cat+1,
@@ -165,7 +169,7 @@ def search():
     ndict = {}
     if comp in i.question.lower():
       ndict['question'] = i.question
-      ndict['category'] = i.category-1
+      ndict['category'] = i.category
       ndict['difficulty'] = i.difficulty
       ndict['answer'] = i.answer
       totQuestions.append(ndict)
@@ -178,9 +182,9 @@ def search():
 
 @app.route("/categories/<int:id>/questions", methods=['GET'])
 def get_questions_categories(id): 
-  questions  = Question.query.filter_by(category=id+1)
+  questions  = Question.query.filter_by(category=str(id+1))
   format_Question = [question.format() for question in questions]
-  current_categorie  = Category.query.get(id+1)
+  current_categorie  = Category.query.get(int(id+1))
   ques = []
 
   for i in questions:
@@ -189,7 +193,7 @@ def get_questions_categories(id):
   return jsonify({
     'questions': format_Question,
     'totalQuestion': len(ques),
-    'currentCategory': current_categorie.type
+    'category': current_categorie.type
   })
 
 
@@ -217,11 +221,11 @@ def get_questions_categories(id):
 @app.route("/quizzes", methods=['POST'])
 def play_game():
   resposta = request.get_json()
-  category = int(resposta['quiz_category']['id']) + 1
+  category = int(resposta['quiz_category']['id'])
   if resposta['quiz_category']['type'] == 'click':
     question = Question.query.all()
   else:
-    question = Question.query.filter_by(category=category)
+    question = Question.query.filter_by(category=str(category+1))
   format_Question = [question.format() for question in question]
   numero = random.randrange(0,len(format_Question))
   print(resposta)
