@@ -221,17 +221,24 @@ def get_questions_categories(id):
 @app.route("/quizzes", methods=['POST'])
 def play_game():
   resposta = request.get_json()
-  category = int(resposta['quiz_category']['id'])
+  previous=resposta['previous_questions']
+  category = int(resposta['quiz_category']['id'])+1
   if resposta['quiz_category']['type'] == 'click':
     question = Question.query.all()
   else:
-    question = Question.query.filter_by(category=str(category+1))
+    question = Question.query.filter_by(category=str(category))
   format_Question = [question.format() for question in question]
-  numero = random.randrange(0,len(format_Question))
-  print(resposta)
+  numero = random.randrange(0,len(format_Question),step=1)
+  actual_question = format_Question[numero]
+  if actual_question['id'] in previous:
+    actual_question = ""
   return jsonify({
-    'question' :  format_Question[numero]
+    'question' :  actual_question
   })
+
+
+ 
+  
 
 app.run(debug=True)
 
