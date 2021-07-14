@@ -5,7 +5,7 @@ from flask_cors import CORS
 import random
 from models import setup_db, Question, Category
 
-QUESTIONS_PER_PAGE = 10
+
 
 
   # create and configure the app
@@ -57,7 +57,10 @@ def get_categories():
   lista = []
   for i in categories:
     lista.append(i.type)
+  print (lista)
   return jsonify({'category':lista})
+
+
   # '''
   # @TODO: 
   # Create an endpoint to handle GET requests for questions, 
@@ -106,6 +109,9 @@ def get_questions():
   # '''
 
   # '''
+
+
+
 
 @app.route("/questions/<int:id>/delete",methods=['DELETE'])
 def delete_questions(id):
@@ -227,20 +233,17 @@ def play_game():
     question = Question.query.all()
   else:
     question = Question.query.filter_by(category=str(category))
-  format_Question = [question.format() for question in question]
-  numero = random.randrange(0,len(format_Question),step=1)
-  actual_question = format_Question[numero]
-  if actual_question['id'] in previous:
-    actual_question = ""
+  if len(previous)<=5:
+    format_Question = [question.format() for question in question]
+    numero = random.randrange(0,len(format_Question))
+    print(numero)
+    actual_question = format_Question[numero]
+    if actual_question['id'] in previous:
+      actual_question = ""
   return jsonify({
     'question' :  actual_question
   })
 
 
  
-  
-
-app.run(debug=True)
-
-
 
